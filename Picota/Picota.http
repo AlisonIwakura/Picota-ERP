@@ -1,0 +1,6 @@
+@Picota_HostAddress = http://localhost:5019
+
+GET {{Picota_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
