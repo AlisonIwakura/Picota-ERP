@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Picota.Models;
 
 namespace Picota.Controllers
@@ -7,33 +8,34 @@ namespace Picota.Controllers
     [Route("api/[controller]")]
     public class ClientesController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetClientes()
+        private readonly Contexto _context;
+
+        public ClientesController(Contexto context)
         {
-            return Ok(new[]
-            {
-                new { Id = 1, Nome = "teste1" },
-                new { Id = 2, Nome = "teste2" }
-            });
+            _context = context;
         }
 
+        // GET: api/Clientes
+        [HttpGet]
+        public async Task<IActionResult> GetClientes()
+        {
+            var clientes = await _context.Clientes.ToListAsync();
+            return Ok(clientes);
+        }
 
+        // POST: api/Clientes
         [HttpPost]
-        public IActionResult CriarCliente(Cliente cliente)
+        public async Task<IActionResult> CriarCliente([FromBody] Cliente cliente)
         {
-            return Ok(cliente);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _context.Clientes.Add(cliente);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetClientes), new { id = cliente.Id }, cliente);
         }
-
-        [HttpGet]
-        public IActionResult GetAgenda(Agenda agenda)
-        {
-
-            return Ok(agenda);
-        }
-
-
-
-
-
     }
 }
